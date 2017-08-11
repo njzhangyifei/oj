@@ -24,6 +24,11 @@ class Solution {
                 left = l;
                 height = h;
             }
+
+            point(point * other){
+                left = other->left;
+                height = other->height;
+            }
         };
 
         struct skyline {
@@ -32,14 +37,34 @@ class Solution {
             skyline * merge(skyline * r){
                 int l_index = 0;
                 int r_index = 0;
+                skyline * s = new skyline();
                 while (l_index < this->points.size() && r_index < r->points.size()) {
-
+                    auto left_point = this->points[l_index];
+                    auto right_point = r->points[r_index];
+                    if (left_point->left < right_point->left){
+                        s->points.push_back(new point(left_point));
+                        l_index++;
+                        continue;
+                    } else if (left_point->left == right_point->left){
+                        s->points.push_back(
+                                new point(left_point->left, 
+                                    max(right_point->height, left_point->height)
+                                    ));
+                        l_index++;
+                        r_index++;
+                    } else {
+                        s->points.push_back(new point(right_point));
+                        r_index++;
+                    }
                 }
-                return nullptr;
+                for (;  r_index < r->points.size(); r_index++) {
+                    s->points.push_back(new point(this->points[r_index]));
+                }
+                return s;
             }
         };
 
-        skyline * get_skyline(vector<vector<int>>buildings, int left, int right){
+        skyline * get_skyline(vector<vector<int>> & buildings, int left, int right){
             if (left >= right) {
                 return nullptr;
             }
@@ -64,11 +89,18 @@ class Solution {
         }
 
         vector<pair<int, int>> getSkyline(vector<vector<int>>& buildings) {
+            skyline * t = get_skyline(buildings, 0, buildings.size());
+            vector<pair<int, int>> ans;
+            return ans;
         }
 };
 
 int main() {
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */
+    vector<vector<int>> input = 
+        {{2,9,10},{3,7,15},{5,12,12},{15,20,10},{19,24,8}};
+    Solution s;
+    s.getSkyline(input);
     return 0;
 }
 
