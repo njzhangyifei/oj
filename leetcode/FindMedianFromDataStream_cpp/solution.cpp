@@ -30,37 +30,19 @@ class MedianFinder {
 
         void addNum(int num) {
             count ++;
-            if (count == 1) {
-                median = num;
-                lower->insert(num);
-                return;
+            lower->insert(num);
+            upper->insert(*prev(lower->end()));
+            lower->erase(prev(lower->end()));
+            if (upper->size() > lower->size()) {
+                int t = *upper->begin();
+                upper->erase(upper->begin());
+                lower->insert(t);
             }
-            bool odd = count % 2;
-            if (num <= median) {
-                lower->insert(num);
-                if (odd) {
-                    // even => odd
-                    median = *prev(lower->end());
-                } else {
-                    int lst = *prev(lower->end());
-                    lower->erase(prev(lower->end()));
-                    upper->insert(lst);
-                    median = *prev(lower->end()) + *upper->begin();
-                    median /= 2.0;
-                }
+            if (count % 2) {
+                median = *prev(lower->end());
             } else {
-                upper->insert(num);
-                if (odd) {
-                    // even => odd
-                    median = *(upper->begin());
-                } else {
-                    median = *prev(lower->end()) + *upper->begin();
-                    median /= 2.0;
-                    cerr << "size=" << upper->size() << endl;
-                    int fst = *(upper->begin());
-                    upper->erase(upper->begin());
-                    lower->insert(fst);
-                }
+                median = *prev(lower->end()) + *upper->begin();
+                median /= 2.0;
             }
         }
 
@@ -70,7 +52,6 @@ class MedianFinder {
                 cerr << i << " ";
             }
             cerr << endl;
-
             cerr << "upper: ";
             for (auto i : *upper) {
                 cerr << i << " ";
@@ -93,7 +74,8 @@ int main() {
     std::vector<int> v = 
     // {12, 10, 13, 11, 5, 15, 1, 11, 6, 17, 14,8,17,6,4,16,8,10,2,12,0};
     // {1, 2, 3};
-    {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    // {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    {-1, -2, -3, -4, -5};
     for (auto i : v) {
         s.addNum(i);
         cerr << s.findMedian() << endl;
