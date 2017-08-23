@@ -48,26 +48,37 @@ using namespace std;
 class Solution {
 public:
     bool wordBreak(string s, vector<string>& wordDict) {
-        std::vector<bool> m(s.size());
+        std::vector<bool> m(s.size() + 1);
         std::fill(m.begin(), m.end(), false);
 
+        m[0] = true;
         for (int i = 0; i < s.size(); ++i) {
             for (int j = 0; j < wordDict.size(); ++j) {
-                if (wordDict[j].size() + i < s.size()) {
-                    
+                if (wordDict[j].size() + i <= s.size() 
+                        && m[i]) {
+                    if (wordDict[j] == s.substr(i, wordDict[j].size())) {
+                        m[wordDict[j].size() + i] = true;
+                    }
                 }
             }
+
+            // for (auto k : m) {
+                // cerr << k << " ";
+            // }
+            // cerr << endl;
         }
 
-        return false;
+        return m[s.size()];
     }
 };
 
 int main() {
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */   
     Solution s;
-    string in = "leetcodeleet";
-    vector<string> d = {"leet","code", "tcodeleet"};
+    // string in = "leetcodeleet";
+    // vector<string> d = {"leet","code", "tcodeleet"};
+    string in = "a";
+    vector<string> d = {"b"};
     s.wordBreak(in, d);
     return 0;
 }
