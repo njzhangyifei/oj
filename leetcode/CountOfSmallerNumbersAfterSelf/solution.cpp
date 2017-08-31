@@ -31,13 +31,13 @@ class Solution {
         if (l > r) {
             return nullptr;
         }
-        node * root = new node(l, r);
+        node * root = new node(nums[l], nums[r]);
         if (l == r) {
             return root;
         }
         int mid = (l+r)/2;
         root->left = buildSegTree(nums, l, mid);
-        root->left = buildSegTree(nums, mid+1, r);
+        root->right = buildSegTree(nums, mid+1, r);
         return root;
     }
 
@@ -45,6 +45,7 @@ class Solution {
         if (root == nullptr || root->r < l || r < root->l) {
             return 0;
         }
+        // cerr << "l=" << root->l << " r=" << root->r << " c=" << root->count << endl;
         if (l <= root->l && root->r <= r) {
             // completely inside
             return root->count;
@@ -65,13 +66,26 @@ class Solution {
         std::vector<int> v(nums.begin(), nums.end());
         std::sort(v.begin(), v.end());
 
+        auto uniq_t = std::unique(v.begin(), v.end());
+        
+        node * root = buildSegTree(v, 0, uniq_t-v.begin()-1);
+
         std::vector<int> ans(nums.size(), 0);
+        for (int i = nums.size() -1; i >= 0; --i) {
+            ans[i] = segsum(root, INT_MIN, nums[i]);
+            // cerr << ans[i] << endl;
+            update(root, nums[i]);
+        }
+
         return ans;
     }
 };
 
 int main() {
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */
+    vector<int> v = {5,2,6,1};
+    Solution s;
+    s.countSmaller(v);
     return 0;
 }
 
