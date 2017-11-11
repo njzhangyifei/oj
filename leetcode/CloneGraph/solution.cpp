@@ -8,6 +8,7 @@
 #include <set>
 #include <stack>
 #include <map>
+#include <unordered_set>
 #include <unordered_map>
 #include <cstring>
 #include <climits>
@@ -29,12 +30,13 @@ class Solution {
                 return NULL;
             }
             unordered_map<int, UndirectedGraphNode *> nodes;
-            unordered_map<int, bool> visited;
+            unordered_set<int> visited;
             
             std::stack<UndirectedGraphNode *> s;
             auto root = new UndirectedGraphNode(node->label);
             nodes[node->label] = root;
             s.push(node);
+            visited.insert(node->label);
             while (s.size()) {
                 UndirectedGraphNode * curr = s.top();
                 UndirectedGraphNode * curr_clone = nodes[curr->label];
@@ -44,12 +46,16 @@ class Solution {
                     UndirectedGraphNode * neigh_clone = NULL;
                     if (nodes.find(neigh->label) == nodes.end()) {
                         nodes[neigh->label] = new UndirectedGraphNode(neigh->label);
-                        // s.push(neigh);
-                    } else {
-                        neigh_clone = nodes[neigh->label];
+                    }
+                    neigh_clone = nodes[neigh->label];
+                    curr_clone->neighbors.push_back(neigh_clone);
+                    if (visited.find(neigh->label) == visited.end()) {
+                        s.push(neigh);
+                        visited.insert(neigh->label);
                     }
                 }
             }
+            return root;
         }
 };
 

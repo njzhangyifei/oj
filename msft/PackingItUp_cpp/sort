@@ -1,0 +1,62 @@
+void swap(int* first, int* second) {
+	int temp = *first;
+	*first = *second;
+	*second = temp;
+}
+
+void printArray(int ar_size, int * _ar) {
+	for (int i = 0; i<ar_size; i++) {
+		cout << _ar[i] << " ";
+	}
+	cout << endl;
+}
+void insertionSort(int ar_size, int * _ar) {
+	int * temp;
+	for (int i = 1; i < ar_size; i++) {
+		temp = &_ar[i];
+		for (int j = 0; j < i; j++) {
+			if (_ar[j] > *temp) {
+				swap(&_ar[j], temp);
+			}
+		}
+		printArray(ar_size, _ar);
+	}
+}
+
+void bubbleSort(int size, int * a) {
+	for (int i = 0; i < size; i++) {
+		// Track number of elements swapped during a single array traversal
+		int numberOfSwaps = 0;
+
+		for (int j = 0; j < size - 1; j++) {
+			// Swap adjacent elements if they are in decreasing order
+			if (a[j] > a[j + 1]) {
+				swap(a[j], a[j + 1]);
+				numberOfSwaps++;
+			}
+		}
+
+		// If no elements were swapped during a traversal, array is sorted
+		if (numberOfSwaps == 0) {
+			break;
+		}
+	}
+}
+
+void selectionSort(int _ar_size,int * _ar) {
+	int min;
+	for (int i = 0; i < _ar_size; i++) {
+		min = i;
+		for (int j = i + 1; j < _ar_size; j++) {
+			if (_ar[j] < _ar[min]) {
+				min = j;
+			}
+		}
+
+		
+		swap(&_ar[min], &_ar[i]);
+		
+	}
+}
+
+
