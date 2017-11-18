@@ -30,9 +30,20 @@ class Solution {
             if (len > n) {
                 return count;
             }
-            for (int i = 0; i < count; ++i) {
-                
+            visited[start] = true;
+            for (int i = 1; i < 9; ++i) {
+                if (start == i) {
+                    // skip self
+                    continue;
+                }
+                if ((!visited[i]) &&
+                    (skip[start][i] == 0 || visited[skip[start][i]])
+                    ){
+                    count = solve(skip, visited, i, len, count, m, n);
+                }
             }
+            visited[start] = false;
+            return count;
         }
 
         int numberOfPatterns(int m, int n) {
@@ -46,7 +57,7 @@ class Solution {
             skip[4][6] = skip[6][4] = 5;
             skip[7][3] = skip[3][7] = 5;
             
-            std::vector<bool> visited;
+            std::vector<bool> visited (10, false);
             int res = 0;
             res += solve(skip, visited, 1, 1, 0, m, n) * 4;
             res += solve(skip, visited, 2, 1, 0, m, n) * 4;
