@@ -15,77 +15,74 @@
 using namespace std;
 
 class Solution {
-    struct node {
-        int l; int r;
-        int count;
-        node * left; node * right;
+public:
 
-        node (int l, int r){
-            this->l = l; this->r = r;
-            this->count = 0;
-            this->left = nullptr; this->right= nullptr;
+    void merge(
+            vector<int> & nums, 
+            vector<int> & index, 
+            vector<int> & count,
+            int start, int end) {
+        std::vector<int> next_index(end-start+1, 0);
+        int curr = 0;
+        int mid = (start + end) / 2;
+        int inversion_count = 0;
+        int l1_idx = start;
+        int l2_idx = mid + 1;
+        while (l1_idx <= mid && l2_idx <= end) {
+            if (nums[index[l1_idx]] <= nums[index[l2_idx]]) {
+                // correct
+                next_index[curr] = index[l1_idx];
+                count[next_index[curr]] += (inversion_count);
+                l1_idx++;
+            } else {
+                // inversion
+                next_index[curr] = index[l2_idx];
+                inversion_count ++;
+                l2_idx++;
+            }
+            curr ++;
         }
-    };
+        for (int i = l1_idx; i <= mid; ++i) {
+            next_index[curr ] = index[i];
+            count[next_index[curr]] += (inversion_count);
+            curr++;
+        }
+        for (int i = l2_idx; i <= end; ++i) {
+            next_index[curr ++ ] = index[i];
+        }
 
-    node * buildSegTree(vector<int> & nums, int l, int r) {
-        if (l > r) {
-            return nullptr;
-        }
-        node * root = new node(nums[l], nums[r]);
-        if (l == r) {
-            return root;
-        }
-        int mid = (l+r)/2;
-        root->left = buildSegTree(nums, l, mid);
-        root->right = buildSegTree(nums, mid+1, r);
-        return root;
-    }
-
-    int segsum (node * root, int l, int r) {
-        if (root == nullptr || root->r < l || r < root->l) {
-            return 0;
-        }
-        // cerr << "l=" << root->l << " r=" << root->r << " c=" << root->count << endl;
-        if (l <= root->l && root->r <= r) {
-            // completely inside
-            return root->count;
-        }
-        return segsum(root->left, l, r) + segsum(root->right, l, r);
-    }
-
-    void update(node * root, int val) {
-        if (root != nullptr && root->l <= val && val <= root->r) {
-            root->count ++;
-            update(root->left, val);
-            update(root->right, val);
+        for (int i = start; i <= end; ++i) {
+            index[i] = next_index[i-start];
         }
     }
 
-    public:
+    void mergeSort(
+            vector<int> & nums, 
+            vector<int> & index, 
+            vector<int> & count,
+            int start, int end){
+        if (start >= end) {
+            return;
+        }
+        int mid = (start + end) / 2;
+        mergeSort(nums, index, count, start, mid);
+        mergeSort(nums, index, count, mid+1, end);
+        merge(nums, index, count, start, end);
+    }
+
     vector<int> countSmaller(vector<int>& nums) {
-        std::vector<int> v(nums.begin(), nums.end());
-        std::sort(v.begin(), v.end());
-
-        auto uniq_t = std::unique(v.begin(), v.end());
-        
-        node * root = buildSegTree(v, 0, uniq_t-v.begin()-1);
-
-        std::vector<int> ans(nums.size(), 0);
-        for (int i = nums.size() -1; i >= 0; --i) {
-            ans[i] = segsum(root, INT_MIN, nums[i]);
-            // cerr << ans[i] << endl;
-            update(root, nums[i]);
+        std::vector<int> v;
+        for (int i = 0; i < nums.size(); ++i) {
+            v.push_back(i);
         }
-
-        return ans;
+        std::vector<int> res (nums.size(), 0);
+        mergeSort(nums, v, res, 0, nums.size() -1);
+        return res;
     }
 };
 
 int main() {
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */
-    vector<int> v = {5,2,6,1};
-    Solution s;
-    s.countSmaller(v);
     return 0;
 }
 

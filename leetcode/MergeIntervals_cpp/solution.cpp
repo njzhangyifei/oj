@@ -7,6 +7,7 @@
 #include <memory>
 #include <set>
 #include <map>
+#include <unordered_set>
 #include <unordered_map>
 #include <cstring>
 #include <climits>
@@ -22,28 +23,37 @@ struct Interval {
 };
 
 class Solution {
-    public:
-        vector<Interval> merge(vector<Interval>& intervals) {
-            if (intervals.size() == 0) {
-                return vector<Interval>();
-            }
-            std::sort(intervals.begin(), intervals.end(), [](Interval a, Interval b){ 
-                    return a.start < b.start;
-                    });
-            vector<Interval> ans;
-            ans.push_back(intervals[0]);
-            for (int i = 1; i < intervals.size(); ++i) {
-                if (intervals[i].start < ans.back().end) {
-                    //merge
-                    ans.back().end = max(ans.back().end, intervals[i].end);
-                } else {
-                    ans.push_back(intervals[i]);
-                }
-            }
-            return ans;
+public:
+    vector<Interval> merge(vector<Interval>& intervals) {
+        std::vector<Interval> res;
+        if (intervals.size() == 0) {
+            return res;
         }
-};
+        sort(intervals.begin(), intervals.end(), 
+            [](const Interval & l, const Interval & r) {
+            return l.start > r.start;
+        });
 
+        res.push_back(intervals.back());
+        intervals.pop_back();
+
+        while (intervals.size()) {
+            auto interval = intervals.back();
+            if (interval.end <= res.back().end) {
+                intervals.pop_back();
+                continue;
+            } else if (interval.start <= res.back().end && 
+                interval.end >= res.back().end) {
+                res.back().end = interval.end;
+            } else {
+                res.push_back(interval);
+            }
+            intervals.pop_back();
+        }
+
+        return res;
+    }
+};
 
 int main() {
     /* Enter your code here. Read input from STDIN. Print output to STDOUT */   

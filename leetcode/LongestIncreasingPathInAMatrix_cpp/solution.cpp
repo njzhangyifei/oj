@@ -17,52 +17,36 @@ using namespace std;
 
 class Solution {
     public:
-        int dfs(vector<vector<int>> & matrix, int ** longest,
-                int _i, int _j, int num_row, int num_col){
-            int val = matrix[_i][_j];
-            int max_len = 1;
-            if (_i > 0 && matrix[_i-1][_j] > val) {
-                // up
-                int len = 0;
-                if (longest[_i-1][_j] >= 0) {
-                    len = longest[_i-1][_j]; 
-                } else {
-                    len = dfs(matrix, longest, _i-1, _j, num_row, num_col);
+        vector<pair<int,int>> dirs = {
+            {-1, 0},
+            {1, 0},
+            {0, 1},
+            {0, -1}
+        };
+
+        void dfs(
+                vector<vector<int>> & matrix,
+                vector<vector<int>> & val,
+                int num_row, int num_col,
+                int x, int y
+                ) {
+
+            for (int i = 0; i < dirs.size(); ++i) {
+                int xx = dirs[i].first + x;
+                int yy = dirs[i].second + y;
+                // check each
+                val[x][y] = max(val[x][y], 1);
+                if ((xx >= 0 && xx < num_row) && (yy >= 0 && yy < num_col)) {
+                    if (matrix[xx][yy] > matrix[x][y]) {
+                        // increasing!
+                        if (val[xx][yy] == -1) {
+                            // visit
+                            dfs(matrix, val, num_row, num_col, xx, yy);
+                        }
+                        val[x][y] = max(val[x][y], 1+val[xx][yy]);
+                    }
                 }
-                max_len = max(len + 1, max_len);
             }
-            if (_i < num_row-1 && matrix[_i+1][_j] > val) {
-                // down
-                int len = 0;
-                if (longest[_i+1][_j] >=  0) {
-                    len = longest[_i+1][_j]; 
-                } else {
-                    len = dfs(matrix, longest, _i+1, _j, num_row, num_col);
-                }
-                max_len = max(len + 1, max_len);
-            }
-            if (_j > 0 && matrix[_i][_j-1] > val) {
-                // left
-                int len = 0;
-                if (longest[_i][_j-1] >= 0) {
-                    len = longest[_i][_j-1];
-                } else {
-                    len = dfs(matrix, longest, _i, _j-1, num_row, num_col);
-                }
-                max_len = max(len + 1, max_len);
-            }
-            if (_j < num_col-1 && matrix[_i][_j+1] > val) {
-                // right
-                int len = 0;
-                if (longest[_i][_j+1] >= 0) {
-                    len = longest[_i][_j+1];
-                } else {
-                    len = dfs(matrix, longest, _i, _j+1, num_row, num_col);
-                }
-                max_len = max(len + 1, max_len);
-            }
-            longest[_i][_j] = max_len;
-            return max_len;
         }
         int longestIncreasingPath(vector<vector<int>>& matrix) {
             int num_row = matrix.size();
@@ -73,30 +57,14 @@ class Solution {
             if (num_col == 0) {
                 return 0;
             }
-
-            int * longest[num_row];
-            for (int i = 0; i < num_row; ++i) {
-                longest[i] = new int[num_col];
-                for (int j = 0; j < num_col; ++j) {
-                    longest[i][j]=-1;
-                }
-            }
-
-            int max_res = 0;
+            vector<vector<int>> val (num_row, vector<int>(num_col, -1));
+            int max_res = INT_MIN;
             for (int i = 0; i < num_row; ++i) {
                 for (int j = 0; j < num_col; ++j) {
-                    int res = 0;
-                    if (longest[i][j] >= 0) {
-                        res = longest[i][j];
-                        max_res = max(max_res, res);
-                        continue;
+                    if (val[i][j] == -1) {
+                        dfs(matrix, val, num_row, num_col, i, j);
                     }
-
-                    // cerr << "dfs on " << i  << ", " << j << endl;
-                    int r = dfs(matrix, (int **)longest, i, j, num_row, num_col);
-                    // cerr << "result = " << r << endl;
-                    longest[i][j] = r;
-                    max_res = max(r, max_res);
+                    max_res = max(max_res, val[i][j]);
                 }
             }
             return max_res;
